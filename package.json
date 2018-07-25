@@ -1,0 +1,25 @@
+{
+  "name": "calculus-scraper",
+  "version": "1.0.0",
+  "description": "small script to scrape Calculus",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/light-bringer/calculus-scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/light-bringer/calculus-scraper/issues"
+  },
+  "homepage": "https://github.com/light-bringer/calculus-scraper#readme",
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "mongodb": "^3.1.1",
+    "request": "^2.87.0",
+    "requests": "^0.2.2"
+  }
+}

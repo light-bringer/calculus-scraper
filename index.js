@@ -20,7 +20,7 @@ const parent_request_array = ['720699', '948272'];
 
 
 let myfunc = {
-  'parse_string' :  array_str => {
+  'parse_history' :  array_str => {
                         let separator = ',';
                         let arrayOfStrings = array_str.slice(1, -1).split(separator);
                         return arrayOfStrings;
@@ -29,42 +29,69 @@ let myfunc = {
                   let url = host + path;
                   url = _.replace(url, '%s', string);
                   return url;
+  },
+  'calculus_get' : url=> {
+                      let options = {
+                        'url': url,
+                        'headers' : {
+                          'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
+                        }
+                      };
+                      return new Promise((resolve, reject)=> {
+                        request.get(options, (err, resp, body)=> {
+                          if(err) {
+                            reject(err);
+                          }
+                          else {
+                            console.log(body);
+                            resolve(body);
+                          }
+                        });
+                      });
   }
 }
 
 
+
 let Calculus = {
-  'get_history' : 
-
-}
-
-
-try {
-  let requests_array = [];
-  _.forEach(parent_request_array, (value)=> {
-    let history_url;
-    history_url = myfunc.gen_url(calculus_host, history, value);
-    console.log(history_url);
-    request.
-      get(history_url, (error, response, body)=> {
-        let request_ids = myfunc.parse_string(body);
-        console.log(request_ids);
-        requests_array = requests_array.concat(request_ids);
-        console.log(requests_array);
-      });
-    console.log(requests_array);
-  });
-  mongoClient.connect((err, client) => {
-    let db = client.db("calculus");
-    client.close();
-    if(err) {
-      throw err;
+'get_history' :  parent_array => {
+                  let requests_array = [];
+                  let fn = myfunc.calculus_get(myfunc.gen_url());
+                  let actions = parent_array.map(fn);
+                  let results = Promise.all(actions);
+                  return new Promise((resolve, reject)=> {
+                    let value;
+                    for(value in parent_request_array) {
+                      var history_url = myfunc.gen_url(calculus_host, history, value);
+                      myfunc.calculus_get(history_url).
+                        then(
+                          result=> {
+                            requests_array = requests_array.concat(myfunc.parse_history(result));
+                          }
+                          , err=> {
+                            console.log("Calculus problem");
+                            reject('Calculus Down!');
+                          }
+                        );
+                    }
+                    console.log(requests_array);
+                    resolve(requests_array);
+                  });
     }
-  });
-}
-catch (err){
-  console.error(err);
 }
 
 
-module.exports = myfunc;
+
+//test
+Calculus.get_history(parent_request_array).
+  then(
+    result=> {
+      console.log(result);
+    }
+    , err=> {
+      console.log(err);
+    });
+
+
+module.exports.myfunc = myfunc;
+module.exports.Calculus = Calculus;
